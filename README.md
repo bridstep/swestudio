@@ -1,0 +1,2 @@
+# swestudio
+Static website
