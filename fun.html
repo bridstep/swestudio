@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fun | SWEStudio.dev</title>
+  <link rel="stylesheet" href="styles/skills.css">
+  <link rel="icon" type="image/png" href="assets/fire.svg">
+</head>
+<body>
+
+  <canvas id="matrix" aria-hidden="true"></canvas>
+
+  <nav class="nav">
+    <a href="index.html" class="hex-wrapper glass3d" aria-label="Back to home">
+      <div class="hex-content"><span>Home</span></div>
+    </a>
+  </nav>
+
+  <script>
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    // Printable ASCII characters: ! (33) through ~ (126)
+    const CHARS = Array.from({ length: 94 }, (_, i) => String.fromCharCode(33 + i));
+
+    const FONT_SIZE = 16;      // px per character cell
+    const FRAME_MS = 45;       // lower = faster rain
+    const RESET_CHANCE = 0.975; // higher = longer streams
+
+    let columns = 0;
+    let drops = [];            // current row of each column's lead character
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      ctx.fillStyle = "#030305";
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+      columns = Math.ceil(window.innerWidth / FONT_SIZE);
+      // Start each column at a random negative row so the rain staggers in
+      drops = Array.from({ length: columns }, () => -Math.floor(Math.random() * 50));
+    }
+
+    function draw() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      // Translucent fill fades previous characters into trails
+      ctx.fillStyle = "rgba(3, 3, 5, 0.12)";
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.font = FONT_SIZE + "px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+      ctx.textBaseline = "top";
+
+      for (let i = 0; i < columns; i++) {
+        const row = drops[i];
+        if (row >= 0) {
+          const char = CHARS[Math.floor(Math.random() * CHARS.length)];
+          const x = i * FONT_SIZE;
+          const y = row * FONT_SIZE;
+
+          // Bright head
+          ctx.fillStyle = "#e8fff0";
+          ctx.fillText(char, x, y);
+
+          // Re-tint the cell above in green so the trail reads as green
+          if (row > 0) {
+            const trailChar = CHARS[Math.floor(Math.random() * CHARS.length)];
+            ctx.fillStyle = "#1fdc5a";
+            ctx.fillText(trailChar, x, y - FONT_SIZE);
+          }
+        }
+
+        if (row * FONT_SIZE > h && Math.random() > RESET_CHANCE) {
+          drops[i] = 0;
+        } else {
+          drops[i] = row + 1;
+        }
+      }
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
+      // Respect the setting: draw a still frame instead of animating
+      drops = drops.map(() => Math.floor(Math.random() * (window.innerHeight / FONT_SIZE)));
+      for (let i = 0; i < 80; i++) draw();
+    } else {
+      let last = 0;
+      function loop(now) {
+        if (now - last >= FRAME_MS) {
+          last = now;
+          draw();
+        }
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    }
+  </script>
+
+</body>
+</html>

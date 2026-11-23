@@ -1,0 +1,173 @@
+/* Reset & Base Setup */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --hex-width: 170px;
+  --hex-height: calc(var(--hex-width) * 1.1547);
+  --hex-gap: 12px;
+}
+
+body {
+  background-color: #030305;
+  /* Rich background gradients so the glass blur & saturation effect stands out */
+  background-image: 
+    /* radial-gradient(circle at 15% 20%, rgba(35, 50, 110, 0.45) 0%, transparent 45%), */
+    /* radial-gradient(circle at 85% 80%, rgba(70, 25, 60, 0.35) 0%, transparent 45%); */
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.18) 0%, transparent 45%);
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Cluster Container */
+.honeycomb-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Individual Rows */
+.hex-row {
+  display: flex;
+  gap: var(--hex-gap);
+  margin-bottom: calc((var(--hex-height) * -0.25) + (var(--hex-gap) * 0.866));
+}
+
+.hex-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Hexagon Base Wrapper */
+.hex-wrapper {
+  width: var(--hex-width);
+  height: var(--hex-height);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Keep link color white in every state (prevents default purple/blue) */
+.hex-wrapper,
+.hex-wrapper:visited,
+.hex-wrapper:hover,
+.hex-wrapper:active,
+.hex-wrapper:focus-visible {
+  color: #ffffff;
+}
+
+/* --- Your .glass3d Implementation --- */
+.glass3d { 
+  --filter-glass3d: blur(28px) brightness(1.3) saturate(1.8); 
+  /* --color-glass3d: hsl(225 70% 15% / 0.25);  */
+  --color-glass3d: hsl(0deg 0% 100% / 25%);
+  --noise-glass3d: url("https://www.transparenttextures.com/patterns/egg-shell.png"); 
+
+  position: relative; 
+  z-index: 4; 
+  /* Converted box-shadow to filter: drop-shadow so clip-path doesn't cut off outer shadows */
+  filter: 
+    drop-shadow(0 0 0.75px hsl(205 20% 10% / 0.2))
+    drop-shadow(1.3px 1.5px 2.2px hsl(205 20% 10% / 0.1))
+    drop-shadow(6px 7px 12px hsl(205 20% 10% / 0.25));
+} 
+
+.glass3d::before { 
+  content: ""; 
+  position: absolute; 
+  inset: 0; 
+  pointer-events: none; 
+  /* Clipped to match the hexagon polygon */
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  overflow: hidden; 
+  z-index: 3; 
+  
+  -webkit-backdrop-filter: var(--filter-glass3d); 
+  backdrop-filter: var(--filter-glass3d); 
+  background-color: var(--color-glass3d); 
+  background-image: var(--noise-glass3d); 
+  background-size: 120px; 
+  background-repeat: repeat; 
+
+  /* Smooth the fill change on hover / click */
+  transition: background-color 0.25s ease;
+} 
+
+.glass3d::after { 
+  content: ""; 
+  position: absolute; 
+  inset: 0; 
+  pointer-events: none; 
+  /* Clipped to match the hexagon polygon */
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  overflow: hidden; 
+  z-index: 5; 
+  
+  box-shadow: 
+    inset 2px 2px 1px -3px hsl(205 20% 90% / 0.8), 
+    inset 4px 4px 2px -6px hsl(205 20% 90% / 0.3), 
+    inset 1.5px 1.5px 1.5px -0.75px hsl(205 20% 90% / 0.15), 
+    inset 1.5px 1.5px 0.25px hsl(205 20% 90% / 0.03), 
+    inset 0 0 0.25px 0.5px hsl(205 20% 90% / 0.03); 
+} 
+
+.glass3d .hex-content,
+.glass3d > * { 
+  position: relative; 
+  z-index: 6; 
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+/* Interactive Hover States */
+.hex-wrapper:hover {
+  transform: scale(1.07);
+  z-index: 10;
+}
+
+/* White glass on hover and keyboard focus */
+.hex-wrapper:hover,
+.hex-wrapper:focus-visible {
+  --color-glass3d: hsl(0 0% 100% / 0.3);
+}
+
+/* Slightly brighter white while pressed (must come after :hover) */
+.hex-wrapper:active {
+  --color-glass3d: hsl(0 0% 100% / 0.45);
+  transform: scale(1.03);
+}
+
+.hex-wrapper:hover.glass3d .hex-content,
+.hex-wrapper:hover.glass3d > * {
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Scaling for Mobile */
+@media (max-width: 600px) {
+  :root {
+    --hex-width: 110px;
+    --hex-gap: 8px;
+  }
+  .glass3d .hex-content,
+  .glass3d > * {
+    font-size: 0.7rem;
+  }
+}
+
+

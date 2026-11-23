@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | SWEStudio.dev</title>
+  <link rel="stylesheet" href="./styles/contact.css">
+</head>
+<body>
+
+  <main class="contact-page">
+
+    <section class="contact-panel glass3d">
+      <div class="panel-inner">
+        <h1>Get in touch</h1>
+        <p class="lede">Have a project, a question, or a role in mind? Send a message and I'll reply by email.</p>
+
+        <form id="contact-form" novalidate>
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </div>
+
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="What would you like to talk about?" required></textarea>
+          </div>
+
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          <p class="direct">Prefer your own email app? Write to <a href="mailto:hello@swestudio.dev">hello@swestudio.dev</a>.</p>
+        </form>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a href="index.html" class="hex-wrapper glass3d back" aria-label="Back to home">
+        <div class="hex-content"><span>Home</span></div>
+      </a>
+      <button type="submit" form="contact-form" class="hex-wrapper glass3d">
+        <div class="hex-content"><span>Send</span></div>
+      </button>
+    </div>
+
+  </main>
+
+  <script>
+    // Static-site friendly: opens the visitor's email app with the message filled in.
+    // Replace this with a fetch() to a form service (Formspree, Netlify Forms, etc.) if you want
+    // messages sent without leaving the page.
+    const RECIPIENT = "hello@swestudio.dev";
+
+    const form = document.getElementById("contact-form");
+    const status = document.getElementById("form-status");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const message = form.message.value.trim();
+
+      if (!name || !email || !message) {
+        status.textContent = "Fill in your name, email, and message before sending.";
+        return;
+      }
+      if (!form.email.checkValidity()) {
+        status.textContent = "Enter a valid email address, like you@example.com.";
+        form.email.focus();
+        return;
+      }
+
+      const subject = encodeURIComponent("Message from " + name + " via SWEStudio.dev");
+      const body = encodeURIComponent(message + "\n\n" + name + "\n" + email);
+      window.location.href = "mailto:" + RECIPIENT + "?subject=" + subject + "&body=" + body;
+      status.textContent = "Opening your email app…";
+    });
+  </script>
+
+</body>
+</html>
