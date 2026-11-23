@@ -110,7 +110,7 @@ body {
 
 /* Image area. Gradients are placeholders; an <img> inside fills the space. */
 .card-media {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 3;
   border-radius: 24px 24px 0 0;
   overflow: hidden;
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
@@ -145,7 +145,7 @@ body {
 .desc {
   color: rgba(255, 255, 255, 0.85);
   margin-top: 14px;
-  max-width: 65ch;
+  max-width: 80ch;
 }
 
 /* Technology tags */
